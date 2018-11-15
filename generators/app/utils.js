@@ -1,11 +1,11 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var shell = require('shelljs');
-var child_process = require('child_process');
-
-var logger = require('./logger');
+const fs = require('fs');
+const path = require('path');
+const shell = require('shelljs');
+const child_process = require('child_process');
+const replace = require('replace-in-file');
+const logger = require('./logger');
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
@@ -13,7 +13,7 @@ function escapeRegExp(str) {
 
 /**
  * 根据标识定位位置，并将提供的内容追加到该位置
- * 
+ *
  * @param {
  *  haystack, // 要处理的内容
  *  splicable, // 追加的内容, 是数组类型，如['', '']。当isAppend=true时，数组中的字符串项会串连成一行；当isAppend=false时，数组中的每一项字符串都会以换行符拼接起来
@@ -22,7 +22,7 @@ function escapeRegExp(str) {
  *  appendAfter, // 追加到该行的位置，是插入行首还是行尾。默认是行尾。只有isAppend为true时有效。
  *  insertPrev // 是否插入到该行的前端还是后面。默认是后面。只有isAppend为false时有效
  * }
- * 
+ *
  * @returns string 处理过后的内容
  */
 function rewrite({haystack, splicable, needle, isAppend=false, appendAfter=true, insertPrev=false}) {
@@ -75,7 +75,7 @@ function rewrite({haystack, splicable, needle, isAppend=false, appendAfter=true,
 
 /**
  * 根据标识定位位置，并将提供的内容追到该位置，文件将被重写成最新内容
- * 
+ *
  * @param {
  *  destRoot, // 生成项目的根路径
  *  fileRelativePath, // 文件相对于destRoot的相对路径
@@ -96,11 +96,11 @@ function rewriteFile({destRoot = process.cwd(), fileRelativePath, splicable, nee
 
 /**
  * 执行控制台命令
- * 
+ *
  * 注意：不要执行输出内容过多的命令，如`npm i --verbose`，要改成`npm i`。否则会报缓存区溢出的错误
- * 
- * @param cmd string 
- * 
+ *
+ * @param cmd string
+ *
  * @returns promise
  */
 function exec(cmd) {
@@ -115,8 +115,32 @@ function exec(cmd) {
   });
 };
 
+/**
+ * 替换文件内容
+ * @param {String} baseDir
+ * @param {Object} replaceInfo {'from keyword': 'to keyword'}
+ * @param {Array} ignores ['node_modules/**']
+ */
+async function replaceFiles(baseDir, replaceInfo, ignores) {
+  let from = Object.keys(replaceInfo).map(key => new RegExp(key, 'g'));
+  let to = Object.values(replaceInfo);
+  const options = {
+    files: `${baseDir}/**/*.*`,
+    from: from,
+    to: to,
+    ignore: ignores
+  };
+  try {
+    const changes = await replace(options);
+    logger.green('Modified files:', changes.join(',\\n'));
+  } catch (error) {
+    logger.red('Error occurred:', error);
+  }
+}
+
 module.exports = {
-  rewrite: rewrite,
-  rewriteFile: rewriteFile,
-  exec: exec
+  rewrite,
+  rewriteFile,
+  exec,
+  replaceFiles,
 };

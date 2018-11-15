@@ -20,10 +20,13 @@
     "yeoman-generator"
   ],
   "dependencies": {
-    "yeoman-generator": "^0.23.0",
-    "underscore.string": "^3.2.2",
-    "deep-extend": "^0.4.0",
     "chalk": "^1.0.0",
+    "deep-extend": "^0.4.0",
+    "fs-extra": "^7.0.1",
+    "moment": "^2.22.2",
+    "replace-in-file": "^3.4.2",
+    "underscore.string": "^3.2.2",
+    "yeoman-generator": "^0.23.0",
     "yosay": "^1.0.0"
   },
   "devDependencies": {
