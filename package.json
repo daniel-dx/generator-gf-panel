@@ -1,8 +1,8 @@
 {
   "name": "generator-gf-panel",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Grafana panel plugin project generator",
-  "homepage": "",
+  "homepage": "https://github.com/daniel-dx/generator-gf-panel",
   "author": {
     "name": "Daniel.xiao",
     "email": "danieldx666@126.com",
